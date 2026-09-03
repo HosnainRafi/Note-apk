@@ -33,13 +33,26 @@ class WidgetService {
     }
   }
 
-  /// Registers background callback for widget clicks
+  /// Registers callback for widget clicks safely
   static Future<void> registerInteractivity(Function(Uri?) callback) async {
     try {
-      HomeWidget.initiallyLaunchedFromHomeWidget().then(callback);
-      HomeWidget.widgetClicked.listen(callback);
+      final uri = await HomeWidget.initiallyLaunchedFromHomeWidget();
+      if (uri != null) {
+        callback(uri);
+      }
     } catch (e) {
-      debugPrint('Error registering widget callback: $e');
+      debugPrint('Error reading initial widget launch URI: $e');
+    }
+
+    try {
+      HomeWidget.widgetClicked.listen(
+        callback,
+        onError: (e) {
+          debugPrint('widgetClicked stream error: $e');
+        },
+      );
+    } catch (e) {
+      debugPrint('Error subscribing to widget clicked stream: $e');
     }
   }
 }

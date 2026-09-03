@@ -48,6 +48,7 @@ class _VoiceCaptureDialogState extends State<VoiceCaptureDialog>
   }
 
   Future<void> _startRecording() async {
+    if (!mounted) return;
     setState(() {
       _transcript = '';
       _isListening = true;
@@ -56,6 +57,7 @@ class _VoiceCaptureDialogState extends State<VoiceCaptureDialog>
     await _speechService.startListening(
       localeId: _localeMode,
       onResult: (text, isFinal, lang) {
+        if (!mounted) return;
         setState(() {
           _transcript = text;
           _detectedLang = lang;
@@ -69,6 +71,7 @@ class _VoiceCaptureDialogState extends State<VoiceCaptureDialog>
 
   Future<void> _stopRecording() async {
     await _speechService.stopListening();
+    if (!mounted) return;
     setState(() {
       _isListening = false;
     });

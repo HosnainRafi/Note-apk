@@ -111,6 +111,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
 
     setState(() => _isLoadingAI = true);
     final summary = await GeminiService.summarizeNote(text: text, language: _language);
+    if (!mounted) return;
     setState(() => _isLoadingAI = false);
 
     if (summary != null) {

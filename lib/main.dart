@@ -2,26 +2,35 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'screens/home_screen.dart';
 import 'services/widget_service.dart';
+import 'services/google_sync_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Set system UI overlay style
-  SystemChrome.setSystemUIOverlayStyle(
-    const SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.dark,
-    ),
-  );
+  try {
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.dark,
+      ),
+    );
+  } catch (e) {
+    debugPrint('Error setting system UI overlay style: $e');
+  }
 
-  // Initialize Android Home Screen Widget bridge
-  await WidgetService.initialize();
+  // Initialize Android Home Screen Widget bridge safely
+  try {
+    await WidgetService.initialize();
+  } catch (e) {
+    debugPrint('WidgetService.initialize error: $e');
+  }
 
   runApp(const HeyNoteApp());
 }
 
 class HeyNoteApp extends StatefulWidget {
-  const HeyNoteApp({Key? key}) : super(key: key);
+  const HeyNoteApp({super.key});
 
   @override
   State<HeyNoteApp> createState() => _HeyNoteAppState();
@@ -33,14 +42,42 @@ class _HeyNoteAppState extends State<HeyNoteApp> {
   @override
   void initState() {
     super.initState();
-    // Listen to Home Screen Widget clicks
-    WidgetService.registerInteractivity((Uri? uri) {
-      if (uri != null && uri.host == 'record') {
-        setState(() {
-          _recordFromWidget = true;
-        });
+    _checkInitialIntent();
+    _initGoogleSync();
+    // Listen to Home Screen Widget clicks safely
+    try {
+      WidgetService.registerInteractivity((Uri? uri) {
+        if (uri != null && uri.host == 'record') {
+          if (mounted) {
+            setState(() {
+              _recordFromWidget = true;
+            });
+          }
+        }
+      });
+    } catch (e) {
+      debugPrint('Error registering interactivity in app: $e');
+    }
+  }
+
+  Future<void> _checkInitialIntent() async {
+    const channel = MethodChannel('com.heynote.app/widget');
+    try {
+      final String? initialAction = await channel.invokeMethod('getInitialAction');
+      if (initialAction != null && initialAction.contains('assistant')) {
+        if (mounted) {
+          setState(() {
+            _recordFromWidget = true;
+          });
+        }
       }
-    });
+    } catch (e) {
+      debugPrint('Error reading initial intent: $e');
+    }
+  }
+
+  Future<void> _initGoogleSync() async {
+    await GoogleSyncService.signInSilently();
   }
 
   @override
@@ -54,13 +91,12 @@ class _HeyNoteAppState extends State<HeyNoteApp> {
           seedColor: Colors.black,
           primary: Colors.black,
           secondary: Colors.grey.shade800,
-          background: const Color(0xFFF9FAFB),
+          surface: const Color(0xFFF9FAFB), // 'background' was deprecated; use 'surface'
         ),
         scaffoldBackgroundColor: const Color(0xFFF9FAFB),
         appBarTheme: const AppBarTheme(
           surfaceTintColor: Colors.transparent,
         ),
-        fontFamily: 'Roboto',
       ),
       home: HomeScreen(initialRecordTrigger: _recordFromWidget),
     );

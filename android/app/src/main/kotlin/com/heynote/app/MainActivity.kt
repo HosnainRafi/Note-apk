@@ -14,7 +14,14 @@ class MainActivity: FlutterActivity() {
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL).setMethodCallHandler { call, result ->
             if (call.method == "getInitialAction") {
                 val action = intent?.action
-                result.success(action)
+                val data = intent?.dataString
+                
+                // Fallback for unpublished apps using standard Android intents
+                if (action == "com.google.android.gms.actions.CREATE_NOTE" || action == Intent.ACTION_SEND) {
+                    result.success("heynote://assistant/note")
+                } else {
+                    result.success(data ?: action)
+                }
             } else {
                 result.notImplemented()
             }

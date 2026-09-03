@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import '../models/note_item.dart';
 import '../services/storage_service.dart';
-import '../services/speech_service.dart';
 import '../widgets/note_card.dart';
 import '../widgets/voice_capture_dialog.dart';
 import 'note_editor_screen.dart';
 import 'lock_screen_screen.dart';
+import '../services/google_sync_service.dart';
 
 class HomeScreen extends StatefulWidget {
   final bool initialRecordTrigger;
 
-  const HomeScreen({Key? key, this.initialRecordTrigger = false}) : super(key: key);
+  const HomeScreen({super.key, this.initialRecordTrigger = false});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -38,10 +38,12 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _loadNotes() async {
     setState(() => _isLoading = true);
     final loaded = await _storageService.loadNotes();
-    setState(() {
-      _notes = loaded;
-      _isLoading = false;
-    });
+    if (mounted) {
+      setState(() {
+        _notes = loaded;
+        _isLoading = false;
+      });
+    }
   }
 
   void _openVoiceModal({bool autoStart = true}) {
@@ -52,7 +54,8 @@ class _HomeScreenState extends State<HomeScreen> {
         autoStart: autoStart,
         onSaveNote: (newNote) async {
           await _storageService.addNote(newNote);
-          _loadNotes();
+          await _loadNotes();
+          if (!mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Note Saved: "${newNote.title}"'),
@@ -76,7 +79,7 @@ class _HomeScreenState extends State<HomeScreen> {
             } else {
               await _storageService.updateNote(savedNote);
             }
-            _loadNotes();
+            await _loadNotes();
           },
         ),
       ),
@@ -89,7 +92,7 @@ class _HomeScreenState extends State<HomeScreen> {
         builder: (ctx) => LockScreenScreen(
           onSaveNote: (newNote) async {
             await _storageService.addNote(newNote);
-            _loadNotes();
+            await _loadNotes();
           },
         ),
       ),
@@ -127,9 +130,9 @@ class _HomeScreenState extends State<HomeScreen> {
               child: const Icon(Icons.mic, color: Colors.white, size: 18),
             ),
             const SizedBox(width: 10),
-            Column(
+            const Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
+              children: [
                 Text(
                   'HeyNote',
                   style: TextStyle(
@@ -147,6 +150,25 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
         actions: [
+          // Google Tasks Sync login button
+          IconButton(
+            icon: const Icon(Icons.cloud_sync, color: Colors.black87, size: 22),
+            tooltip: 'Connect Google Tasks',
+            onPressed: () async {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Connecting to Google Tasks...')),
+              );
+              final success = await GoogleSyncService.signIn();
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(success ? 'Connected to Google Tasks!' : 'Failed to connect.'),
+                    backgroundColor: success ? Colors.green : Colors.red,
+                  ),
+                );
+              }
+            },
+          ),
           // Lock Screen launcher button
           TextButton.icon(
             style: TextButton.styleFrom(
@@ -247,12 +269,12 @@ class _HomeScreenState extends State<HomeScreen> {
                               onTap: () => _openEditor(note: note),
                               onDelete: () async {
                                 await _storageService.deleteNote(note.id);
-                                _loadNotes();
+                                await _loadNotes();
                               },
                               onShare: () => _storageService.shareToGoogleKeepOrExternal(note),
                               onToggleCheckItem: (itemId) async {
                                 await _storageService.toggleChecklistItem(note.id, itemId);
-                                _loadNotes();
+                                await _loadNotes();
                               },
                             );
                           },

@@ -33,6 +33,10 @@ class SpeechService {
       if (!ok) return;
     }
 
+    if (_speech.isListening) {
+      await _speech.stop();
+    }
+
     _isListening = true;
 
     // Pick locale
@@ -41,21 +45,28 @@ class SpeechService {
       targetLocale = 'bn_BD';
     } else if (localeId == 'auto') {
       targetLocale = 'bn_BD'; // Default to Bangla with auto-switch fallback
+    } else if (localeId == 'en_US' || localeId == 'en') {
+      targetLocale = 'en_US';
     }
 
     try {
+      // Use SpeechListenOptions to fix deprecation warnings (critical for newer plugin)
+      final options = stt.SpeechListenOptions(
+        listenMode: stt.ListenMode.dictation,
+        cancelOnError: false,
+        partialResults: true,
+        autoPunctuation: false,
+      );
+
       await _speech.listen(
         onResult: (result) {
           final words = result.recognizedWords;
           final isBangla = _hasBanglaCharacters(words);
           final lang = isBangla ? 'bn' : 'en';
-
           onResult(words, result.finalResult, lang);
         },
         localeId: targetLocale,
-        listenMode: stt.ListenMode.dictation,
-        cancelOnError: false,
-        partialResults: true,
+        listenOptions: options,
       );
     } catch (e) {
       debugPrint('Error starting speech listen: $e');
@@ -65,7 +76,11 @@ class SpeechService {
 
   Future<void> stopListening() async {
     _isListening = false;
-    await _speech.stop();
+    try {
+      await _speech.stop();
+    } catch (e) {
+      debugPrint('Error stopping speech: $e');
+    }
   }
 
   bool _hasBanglaCharacters(String text) {
@@ -122,7 +137,7 @@ class SpeechService {
     // Auto title
     String title = clean;
     if (clean.length > 35) {
-      title = clean.substring(0, 32) + '...';
+      title = '${clean.substring(0, 32)}...';
     }
 
     NoteCategory cat = NoteCategory.memo;

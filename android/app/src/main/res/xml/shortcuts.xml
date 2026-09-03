@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <capability android:name="actions.intent.CREATE_NOTE">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.heynote.app"
+            android:targetClass="com.heynote.app.MainActivity">
+            <!-- This maps the text of the note to the intent data -->
+            <parameter
+                android:name="note.text"
+                android:key="text" />
+            <!-- Deep link that Flutter will intercept -->
+            <url-template android:value="heynote://assistant/note{?text}" />
+        </intent>
+    </capability>
+</shortcuts>

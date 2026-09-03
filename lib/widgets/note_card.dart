@@ -199,7 +199,7 @@ class _NoteCardState extends State<NoteCard> {
                             child: Icon(
                               item.isDone ? Icons.check_circle : Icons.radio_button_unchecked,
                               size: 16,
-                              color: item.isDone ? Colors.emerald : Colors.grey.shade400,
+                              color: item.isDone ? const Color(0xFF10B981) : Colors.grey.shade400,
                             ),
                           ),
                           const SizedBox(width: 8),

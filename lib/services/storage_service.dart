@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:share_plus/share_plus.dart';
 import '../models/note_item.dart';
 import 'widget_service.dart';
+import 'google_sync_service.dart';
 
 class StorageService {
   static const String _notesKey = 'heynote_saved_notes_v1';
@@ -41,6 +42,9 @@ class StorageService {
     final list = await loadNotes();
     list.insert(0, note);
     await saveNotes(list);
+    
+    // Background Sync to Google Tasks
+    GoogleSyncService.syncNoteToGoogleTasks(note);
   }
 
   Future<void> updateNote(NoteItem updatedNote) async {
@@ -49,6 +53,9 @@ class StorageService {
     if (index != -1) {
       list[index] = updatedNote;
       await saveNotes(list);
+      
+      // Background Sync to Google Tasks
+      GoogleSyncService.syncNoteToGoogleTasks(updatedNote);
     }
   }
 
@@ -72,23 +79,30 @@ class StorageService {
   }
 
   Future<void> shareToGoogleKeepOrExternal(NoteItem note) async {
-    String textToShare = note.title + '\n\n';
+    final buffer = StringBuffer();
+    buffer.writeln(note.title);
+    buffer.writeln();
     if (note.isList && note.checklist.isNotEmpty) {
       for (var item in note.checklist) {
-        textToShare += (item.isDone ? '☑ ' : '☐ ') + item.text + '\n';
+        buffer.writeln('${item.isDone ? '☑' : '☐'} ${item.text}');
       }
     } else {
-      textToShare += note.content;
+      buffer.writeln(note.content);
     }
 
     if (note.summary != null && note.summary!.isNotEmpty) {
-      textToShare += '\n\nAI Summary: ' + note.summary!;
+      buffer.writeln();
+      buffer.writeln('AI Summary: ${note.summary}');
     }
 
-    await Share.share(
-      textToShare,
-      subject: 'HeyNote: ' + note.title,
-    );
+    try {
+      await Share.share(
+        buffer.toString().trim(),
+        subject: 'HeyNote: ${note.title}',
+      );
+    } catch (e) {
+      debugPrint('Share error: $e');
+    }
   }
 
   List<NoteItem> _getInitialSampleNotes() {
@@ -113,7 +127,7 @@ class StorageService {
       NoteItem(
         id: 'sample-2',
         title: 'Project Standup Sync',
-        content: 'Review Flutter Android APK build pipeline, test Home Screen Widget receiver, and verify Vosk offline Bangla speech model.',
+        content: 'Review Flutter Android APK, test Home Screen Widget, verify Bangla speech recognition.',
         category: NoteCategory.work,
         language: 'en',
         isList: false,

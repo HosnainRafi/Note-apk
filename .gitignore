@@ -15,3 +15,7 @@ coverage/
 !**/*.apk
 
 
+
+*.apk
+debug_info/
+google-services.json

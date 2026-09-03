@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 enum NoteCategory { personal, work, shopping, checklist, idea, memo }
 
 class ChecklistItem {
@@ -20,7 +18,7 @@ class ChecklistItem {
       };
 
   factory ChecklistItem.fromJson(Map<String, dynamic> json) => ChecklistItem(
-        id: json['id'] as String? ?? UniqueKey().toString(),
+        id: json['id'] as String? ?? DateTime.now().microsecondsSinceEpoch.toString(),
         text: json['text'] as String? ?? '',
         isDone: json['isDone'] as bool? ?? false,
       );

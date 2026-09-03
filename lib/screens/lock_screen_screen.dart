@@ -7,7 +7,7 @@ import '../services/speech_service.dart';
 class LockScreenScreen extends StatefulWidget {
   final Function(NoteItem) onSaveNote;
 
-  const LockScreenScreen({Key? key, required this.onSaveNote}) : super(key: key);
+  const LockScreenScreen({super.key, required this.onSaveNote});
 
   @override
   State<LockScreenScreen> createState() => _LockScreenScreenState();
@@ -56,11 +56,13 @@ class _LockScreenScreenState extends State<LockScreenScreen>
   void _toggleLockRecording() async {
     if (_isListening) {
       await _speechService.stopListening();
+      if (!mounted) return;
       setState(() => _isListening = false);
       if (_transcript.trim().isNotEmpty) {
         _saveLockNote();
       }
     } else {
+      if (!mounted) return;
       setState(() {
         _transcript = '';
         _isListening = true;
@@ -68,6 +70,7 @@ class _LockScreenScreenState extends State<LockScreenScreen>
       await _speechService.startListening(
         localeId: 'auto',
         onResult: (text, isFinal, lang) {
+          if (!mounted) return;
           setState(() {
             _transcript = text;
             if (isFinal) {
@@ -84,6 +87,7 @@ class _LockScreenScreenState extends State<LockScreenScreen>
     if (_transcript.trim().isEmpty) return;
 
     final parsed = _speechService.parseTranscriptOffline(_transcript);
+    int _itemIndex = 0;
     final newNote = NoteItem(
       id: 'lock_note_${DateTime.now().millisecondsSinceEpoch}',
       title: parsed['title'] as String,
@@ -93,7 +97,7 @@ class _LockScreenScreenState extends State<LockScreenScreen>
       isList: parsed['isList'] as bool,
       checklist: (parsed['items'] as List<String>)
           .map((item) => ChecklistItem(
-                id: 'item_${DateTime.now().millisecondsSinceEpoch}',
+                id: 'item_${DateTime.now().millisecondsSinceEpoch}_${_itemIndex++}',
                 text: item,
               ))
           .toList(),
@@ -103,6 +107,7 @@ class _LockScreenScreenState extends State<LockScreenScreen>
     );
 
     widget.onSaveNote(newNote);
+    if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('Saved from Lock Screen: "${newNote.title}"'),
@@ -192,7 +197,7 @@ class _LockScreenScreenState extends State<LockScreenScreen>
                             boxShadow: [
                               BoxShadow(
                                 color: (_isListening ? Colors.redAccent : Colors.white)
-                                    .withOpacity(0.4),
+                                    .withValues(alpha: 0.4),
                                 blurRadius: 30,
                                 spreadRadius: 4,
                               ),

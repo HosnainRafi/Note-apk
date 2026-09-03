@@ -10,14 +10,18 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.6
-  speech_to_text: ^6.6.0
+  speech_to_text: ^7.4.0
   flutter_tts: ^4.0.2
   shared_preferences: ^2.2.2
   http: ^1.2.1
-  home_widget: ^0.6.0
-  intl: ^0.19.0
-  share_plus: ^9.0.0
+  home_widget: ^0.9.3
+  intl: ^0.20.3
+  share_plus: ^13.3.0
   uuid: ^4.4.0
+  google_sign_in: ^6.2.1
+  googleapis: ^13.1.0
+  googleapis_auth: ^1.4.1
+  extension_google_sign_in_as_googleapis_auth: ^2.0.12
 
 dev_dependencies:
   flutter_test:
