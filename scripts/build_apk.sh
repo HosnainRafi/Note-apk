@@ -14,8 +14,10 @@ mkdir -p "$BUILD_DIR/res/values"
 mkdir -p "$BUILD_DIR/res/xml"
 mkdir -p "$BUILD_DIR/res/drawable"
 mkdir -p "$BUILD_DIR/res/mipmap-xxhdpi"
+rm -rf "$BUILD_DIR/bin" "$BUILD_DIR/gen" "$BUILD_DIR/classes"
 mkdir -p "$BUILD_DIR/bin"
 mkdir -p "$BUILD_DIR/gen"
+mkdir -p "$BUILD_DIR/classes"
 mkdir -p "$OUTPUT_DIR"
 
 # Copy Icon
@@ -261,6 +263,9 @@ public class MainActivity extends Activity {
         settings.setDomStorageEnabled(true);
         settings.setDatabaseEnabled(true);
         settings.setAllowFileAccess(true);
+        settings.setAllowContentAccess(true);
+        settings.setAllowFileAccessFromFileURLs(true);
+        settings.setAllowUniversalAccessFromFileURLs(true);
         settings.setMediaPlaybackRequiresUserGesture(false);
 
         // Auto grant audio recording permission in WebView
@@ -299,7 +304,7 @@ public class MainActivity extends Activity {
             }
         }
 
-        String targetUrl = "https://ais-pre-fzfuzdyrj4v5nooalyx2dh-892247535318.asia-southeast1.run.app";
+        String targetUrl = "file:///android_asset/index.html";
         if (autoRecord) {
             targetUrl += "?action=record";
         }
@@ -353,6 +358,12 @@ public class HeyNoteWidgetProvider extends AppWidgetProvider {
 }
 EOF
 
+echo "[Preparation] Bundling web application assets into APK assets..."
+mkdir -p "$BUILD_DIR/assets"
+npm run build
+cp -r dist/* "$BUILD_DIR/assets/"
+rm -f "$BUILD_DIR/assets/"*.apk "$BUILD_DIR/assets/server.cjs"*
+
 echo "[1/6] Generating R.java with AAPT..."
 aapt package -f -m \
     -J "$BUILD_DIR/gen" \
@@ -361,7 +372,7 @@ aapt package -f -m \
     -I "$ANDROID_JAR"
 
 echo "[2/6] Compiling Java classes with javac..."
-javac -d "$BUILD_DIR/bin" \
+javac -d "$BUILD_DIR/classes" \
     -classpath "$ANDROID_JAR:$BUILD_DIR/gen" \
     -source 1.8 -target 1.8 \
     "$BUILD_DIR/gen/com/heynote/app/R.java" \
@@ -369,12 +380,13 @@ javac -d "$BUILD_DIR/bin" \
     "$BUILD_DIR/src/com/heynote/app/HeyNoteWidgetProvider.java"
 
 echo "[3/6] Converting Java bytecode to Dalvik DEX with dx..."
-/usr/bin/dalvik-exchange --dex --output="$BUILD_DIR/bin/classes.dex" "$BUILD_DIR/bin"
+/usr/bin/dalvik-exchange --dex --output="$BUILD_DIR/bin/classes.dex" "$BUILD_DIR/classes"
 
-echo "[4/6] Packaging APK resources and DEX with AAPT..."
+echo "[4/6] Packaging APK resources, assets, and DEX with AAPT..."
 aapt package -f \
     -M "$BUILD_DIR/AndroidManifest.xml" \
     -S "$BUILD_DIR/res" \
+    -A "$BUILD_DIR/assets" \
     -I "$ANDROID_JAR" \
     -F "$BUILD_DIR/bin/heynote-unaligned.apk"
 

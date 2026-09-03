@@ -13,6 +13,7 @@ import {
   QrCode,
   Share2,
   Github,
+  AlertCircle,
 } from 'lucide-react';
 import {
   FLUTTER_PUBSPEC,
@@ -280,15 +281,26 @@ export default function DownloadApkModal({ isOpen, onClose }: DownloadApkModalPr
                   <div className="flex items-center gap-2">
                     <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
                     <span className="text-xs font-semibold text-gray-900 uppercase tracking-wider">
-                      Committed to GitHub
+                      Ready for GitHub: HosnainRafi/Note-apk
                     </span>
                   </div>
-                  <span className="px-2 py-0.5 rounded bg-gray-100 text-gray-700 text-[11px] font-mono">
-                    heynote.apk (21 KB)
+                  <span className="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 font-semibold text-[11px] font-mono">
+                    heynote.apk (378 KB • Standalone Offline)
                   </span>
                 </div>
                 <p className="text-xs text-gray-600 leading-relaxed">
-                  The signed, optimized Android release APK has been committed directly to the root of your GitHub repository. You can install it on any Android device directly from GitHub!
+                  The updated <strong>378 KB</strong> release APK embeds the entire application offline (no external server dependency, no "Page not found" error).
+                </p>
+              </div>
+
+              {/* Clarification about /raw/ */}
+              <div className="p-4 rounded-xl border border-amber-200 bg-amber-50/70 text-amber-900 space-y-1.5">
+                <div className="text-xs font-bold flex items-center gap-1.5">
+                  <AlertCircle className="w-4 h-4 text-amber-600" />
+                  <span>Important Note About "/raw/"</span>
+                </div>
+                <p className="text-[11px] text-amber-800 leading-relaxed">
+                  <strong>"/raw/" is not a folder in your repo!</strong> It is GitHub's URL routing command that tells GitHub to serve the raw binary file directly to your browser instead of opening a web preview page.
                 </p>
               </div>
 
@@ -296,7 +308,7 @@ export default function DownloadApkModal({ isOpen, onClose }: DownloadApkModalPr
               <div className="space-y-3">
                 <h4 className="text-xs font-semibold uppercase tracking-wider text-gray-900 flex items-center gap-1.5">
                   <Github className="w-4 h-4 text-gray-900" />
-                  <span>How to Install Using GitHub on Your Phone</span>
+                  <span>How to Download from HosnainRafi/Note-apk on Your Phone</span>
                 </h4>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -304,9 +316,9 @@ export default function DownloadApkModal({ isOpen, onClose }: DownloadApkModalPr
                     <div className="w-6 h-6 rounded-full bg-gray-100 text-gray-900 font-bold text-xs flex items-center justify-center">
                       1
                     </div>
-                    <div className="font-medium text-xs text-gray-900">Open on Phone</div>
+                    <div className="font-medium text-xs text-gray-900">Open Repository</div>
                     <p className="text-[11px] text-gray-500 leading-relaxed">
-                      Open your repository URL on your Android phone's browser (Chrome, Samsung Internet, or Firefox).
+                      Go to <span className="font-mono text-gray-800">github.com/HosnainRafi/Note-apk</span> in your mobile browser.
                     </p>
                   </div>
 
@@ -316,7 +328,7 @@ export default function DownloadApkModal({ isOpen, onClose }: DownloadApkModalPr
                     </div>
                     <div className="font-medium text-xs text-gray-900">Tap heynote.apk</div>
                     <p className="text-[11px] text-gray-500 leading-relaxed">
-                      Tap <strong>heynote.apk</strong> in the file list, then tap <strong>View raw</strong> or <strong>Download</strong>.
+                      Scroll to <strong>heynote.apk</strong> in the root file list, tap it, then tap <strong>"View raw"</strong> or <strong>"Download"</strong>.
                     </p>
                   </div>
 
@@ -326,29 +338,29 @@ export default function DownloadApkModal({ isOpen, onClose }: DownloadApkModalPr
                     </div>
                     <div className="font-medium text-xs text-gray-900">Install APK</div>
                     <p className="text-[11px] text-gray-500 leading-relaxed">
-                      Tap the downloaded file notification. If prompted, allow <em>"Install unknown apps"</em> and tap <strong>Install</strong>.
+                      Tap the downloaded APK file. Allow "Install unknown apps" if prompted, then launch HeyNote!
                     </p>
                   </div>
                 </div>
               </div>
 
-              {/* Direct GitHub Raw Download Link */}
+              {/* Direct 1-Click Link for HosnainRafi/Note-apk */}
               <div className="p-4 rounded-xl border border-gray-200 bg-gray-50 space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-semibold text-gray-800">Direct GitHub Raw Download Link Format</span>
+                  <span className="text-xs font-semibold text-gray-800">Direct Download Link for Your Repository</span>
                   <button
-                    onClick={() => handleCopy('github-url', 'https://github.com/<YOUR-USERNAME>/<YOUR-REPO>/raw/main/heynote.apk')}
+                    onClick={() => handleCopy('github-url', 'https://github.com/HosnainRafi/Note-apk/raw/main/heynote.apk')}
                     className="text-[11px] text-emerald-700 hover:text-emerald-800 font-medium flex items-center gap-1"
                   >
                     {copied === 'github-url' ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-                    <span>{copied === 'github-url' ? 'Copied' : 'Copy Template'}</span>
+                    <span>{copied === 'github-url' ? 'Copied' : 'Copy Direct Link'}</span>
                   </button>
                 </div>
                 <div className="p-2.5 bg-gray-900 text-gray-200 rounded-lg text-xs font-mono select-all break-all">
-                  https://github.com/&lt;YOUR-USERNAME&gt;/&lt;YOUR-REPO&gt;/raw/main/heynote.apk
+                  https://github.com/HosnainRafi/Note-apk/raw/main/heynote.apk
                 </div>
                 <p className="text-[11px] text-gray-500">
-                  Replace <code className="bg-gray-200 px-1 py-0.5 rounded text-gray-800">&lt;YOUR-USERNAME&gt;</code> and <code className="bg-gray-200 px-1 py-0.5 rounded text-gray-800">&lt;YOUR-REPO&gt;</code> with your GitHub details for a 1-click install link.
+                  Or via GitHub's raw CDN: <code className="bg-gray-200 px-1 py-0.5 rounded text-gray-800 text-[10px]">https://raw.githubusercontent.com/HosnainRafi/Note-apk/main/heynote.apk</code>
                 </p>
               </div>
 

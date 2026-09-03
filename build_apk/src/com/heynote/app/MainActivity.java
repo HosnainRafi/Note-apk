@@ -35,6 +35,9 @@ public class MainActivity extends Activity {
         settings.setDomStorageEnabled(true);
         settings.setDatabaseEnabled(true);
         settings.setAllowFileAccess(true);
+        settings.setAllowContentAccess(true);
+        settings.setAllowFileAccessFromFileURLs(true);
+        settings.setAllowUniversalAccessFromFileURLs(true);
         settings.setMediaPlaybackRequiresUserGesture(false);
 
         // Auto grant audio recording permission in WebView
@@ -73,7 +76,7 @@ public class MainActivity extends Activity {
             }
         }
 
-        String targetUrl = "https://ais-pre-fzfuzdyrj4v5nooalyx2dh-892247535318.asia-southeast1.run.app";
+        String targetUrl = "file:///android_asset/index.html";
         if (autoRecord) {
             targetUrl += "?action=record";
         }
