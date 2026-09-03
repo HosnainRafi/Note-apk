@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">HeyNote</string>
+    <string name="widget_name">HeyNote Quick Mic</string>
+    <string name="widget_description">1-Tap Voice Note Dictation in Bangla and English</string>
+</resources>

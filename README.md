@@ -104,51 +104,98 @@
 
 ---
 
-## 📲 Android Home Screen Widget Setup
+## 📱 Flutter Android APK Build Guide (Ready to Build!)
 
-HeyNote supports two modes for your smartphone's home screen:
+The repository includes the **complete, self-contained Flutter project** ready to build immediately with Flutter 3.x / Dart 3.x!
 
-### Option A: Android Chrome / WebAPK (Zero Code)
-1. Open the app in Chrome on Android.
-2. Tap the browser menu (`⋮`) -> **Install app** or **Add to Home screen**.
-3. Once installed, **long-press the HeyNote app icon** on your home screen.
-4. Drag the **Record Voice Note (ভয়েস রেকর্ড)** shortcut directly to your home screen.
+### 1. Build Requirements
+- [Flutter SDK](https://docs.flutter.dev/get-started/install) (`>= 3.2.0`)
+- Android Studio / Android SDK (Platform SDK 34)
+- Java 17 or Java 11
 
-### Option B: Native Android Studio / Flutter
-The repository includes native widget templates ready to compile:
-- `res/layout/widget_heynote_mic.xml`: High-contrast pill layout with microphone button.
-- `HeyNoteWidgetProvider.kt`: Android AppWidgetProvider triggering `ACTION_RECORD_NOW`.
+### 2. Build Commands
+
+Clone the repository and run:
+
+```bash
+# 1. Fetch Flutter dependencies
+flutter pub get
+
+# 2. Run on connected Android phone or emulator
+flutter run
+
+# 3. Build Universal Release APK
+flutter build apk --release
+```
+
+The compiled release APK will be generated at:
+```
+build/app/outputs/flutter-apk/app-release.apk
+```
+
+#### Optimized Architecture APKs (Smaller file size)
+To generate smaller, per-architecture APKs (`arm64-v8a`, `armeabi-v7a`, `x86_64`):
+```bash
+flutter build apk --split-per-abi
+```
 
 ---
+
+## 📲 Android Home Screen Widget (Included in Flutter)
+
+The Flutter project includes full Android Home Screen Widget integration via `home_widget` and Kotlin:
+
+- **Widget Provider**: `android/app/src/main/kotlin/com/heynote/app/HeyNoteWidgetProvider.kt`
+- **Widget XML Layout**: `android/app/src/main/res/layout/widget_heynote_mic.xml`
+- **Widget Provider Info**: `android/app/src/main/res/xml/heynote_widget_info.xml`
+- **Deep Link**: Tapping the 1-Tap Mic button on the widget dispatches `heynote://record`, instantly launching the Flutter app into active voice recording mode!
+
+### Adding the Widget on Android:
+1. Long-press any empty space on your Android home screen.
+2. Tap **Widgets** -> scroll to **HeyNote**.
+3. Drag the **HeyNote Quick Mic** (4x1 pill widget) to your home screen.
+
+---
+
+## 💻 Web & API Development Server
 
 ## 📂 Project Structure
 
 ```
+├── pubspec.yaml            # Flutter package manifest & dependencies
+├── lib/                    # Flutter Dart Source Code
+│   ├── main.dart           # App entrypoint, theme, and widget deep link handler
+│   ├── models/
+│   │   └── note_item.dart  # Note & Checklist data model with JSON serialization
+│   ├── services/
+│   │   ├── speech_service.dart   # Bilingual speech recognition (Bangla & English)
+│   │   ├── storage_service.dart  # Offline storage & widget synchronizer
+│   │   ├── gemini_service.dart   # Gemini 2.5 Flash summaries & checklists
+│   │   └── widget_service.dart   # HomeWidget Android bridge
+│   ├── screens/
+│   │   ├── home_screen.dart        # Primary notes feed, filters & quick mic FAB
+│   │   ├── note_editor_screen.dart # Full note editor, checklist builder & AI tools
+│   │   └── lock_screen_screen.dart # AMOLED lock screen mode with voice hotword
+│   └── widgets/
+│       ├── note_card.dart            # Interactive note card with checklist toggles
+│       └── voice_capture_dialog.dart # Real-time pulsing microphone dialog
+├── android/                # Native Android Project Configuration
+│   ├── app/
+│   │   ├── build.gradle
+│   │   └── src/main/
+│   │       ├── AndroidManifest.xml   # Permissions, widget receivers & deep links
+│   │       ├── kotlin/com/heynote/app/
+│   │       │   ├── MainActivity.kt
+│   │       │   └── HeyNoteWidgetProvider.kt # Android AppWidgetProvider
+│   │       └── res/
+│   │           ├── layout/widget_heynote_mic.xml # Home Screen Widget layout
+│   │           └── xml/heynote_widget_info.xml   # AppWidget metadata
+│   ├── build.gradle
+│   └── settings.gradle
+├── flutter_app/            # Mirror copy for modular / sub-project workflows
 ├── public/                 # Static assets, PWA icons, manifest.json, pre-built APK
-├── scripts/
-│   └── package_apk.py      # Automated APK packager script
-├── src/
-│   ├── components/
-│   │   ├── DownloadApkModal.tsx       # APK download & WebAPK installation drawer
-│   │   ├── GeminiChatDrawer.tsx       # Context-aware AI chat assistant
-│   │   ├── HomeScreenWidget.tsx       # Live 4x1 & 4x2 home screen widget components
-│   │   ├── HomeScreenWidgetModal.tsx  # Smartphone simulator & interactive widget tester
-│   │   ├── ImageGeneratorModal.tsx    # Imagen 3 AI card artwork generator
-│   │   ├── LockScreenOverlay.tsx      # Hands-free AMOLED lock screen launcher
-│   │   ├── NoteCard.tsx               # Rich note & checklist display
-│   │   ├── NoteCreator.tsx            # Voice input and manual note composer
-│   │   └── Toast.tsx                  # Notification snackbars
-│   ├── hooks/
-│   │   └── usePWAInstall.ts           # PWA install prompt hooks
-│   ├── utils/
-│   │   ├── gemini.ts                  # Server-side AI client calls
-│   │   ├── speech.ts                  # Bilingual speech listener & NLP parser
-│   │   └── storage.ts                 # Local storage and backup synchronizer
-│   ├── types.ts                       # Shared TypeScript interfaces
-│   ├── App.tsx                        # Main application orchestrator
-│   └── main.tsx                       # React DOM entrypoint
+├── src/                    # Web Application & Interactive Preview (React/Vite)
 ├── server.ts               # Express backend API & Vite production middleware
-├── vite.config.ts          # Vite & PWA build configuration
 ├── metadata.json           # App permissions and project metadata
 └── package.json            # Scripts & project dependencies
 ```

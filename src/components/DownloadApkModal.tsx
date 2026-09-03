@@ -17,6 +17,8 @@ import {
   FLUTTER_PUBSPEC,
   ANDROID_MANIFEST,
   FLUTTER_MAIN_DART,
+  ANDROID_WIDGET_PROVIDER,
+  ANDROID_WIDGET_XML,
   downloadFlutterProject,
 } from '../utils/flutterExport';
 import { usePWAInstall } from '../hooks/usePWAInstall';
@@ -28,7 +30,7 @@ interface DownloadApkModalProps {
 
 export default function DownloadApkModal({ isOpen, onClose }: DownloadApkModalProps) {
   const [activeTab, setActiveTab] = useState<'apk' | 'webapk' | 'source'>('apk');
-  const [sourceCodeTab, setSourceCodeTab] = useState<'main' | 'manifest' | 'pubspec'>('main');
+  const [sourceCodeTab, setSourceCodeTab] = useState<'main' | 'manifest' | 'pubspec' | 'widget_kt' | 'widget_xml'>('main');
   const [copied, setCopied] = useState<string | null>(null);
   const [isDownloading, setIsDownloading] = useState(false);
   const { isInstallable, isInstalled, isIOS, isAndroid, install } = usePWAInstall();
@@ -320,17 +322,36 @@ export default function DownloadApkModal({ isOpen, onClose }: DownloadApkModalPr
           {/* TAB 3: FLUTTER & ANDROID STUDIO SOURCE */}
           {activeTab === 'source' && (
             <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="flex gap-2 text-xs">
+              {/* Quick 1-Line Build Banner */}
+              <div className="p-3.5 rounded-xl bg-gray-900 text-white flex items-center justify-between gap-3 text-xs">
+                <div className="flex items-center gap-2 overflow-hidden">
+                  <Terminal className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <code className="text-[11px] font-mono text-emerald-300 truncate">
+                    flutter pub get && flutter build apk --release
+                  </code>
+                </div>
+                <button
+                  onClick={() => handleCopy('build_cmd', 'flutter pub get && flutter build apk --release')}
+                  className="px-2.5 py-1 rounded bg-white/10 hover:bg-white/20 text-white text-[11px] font-medium transition shrink-0 flex items-center gap-1"
+                >
+                  {copied === 'build_cmd' ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                  <span>{copied === 'build_cmd' ? 'Copied' : 'Copy'}</span>
+                </button>
+              </div>
+
+              <div className="flex items-center justify-between flex-wrap gap-2">
+                <div className="flex flex-wrap gap-1.5 text-xs">
                   {[
                     { id: 'main', label: 'lib/main.dart' },
                     { id: 'manifest', label: 'AndroidManifest.xml' },
                     { id: 'pubspec', label: 'pubspec.yaml' },
+                    { id: 'widget_kt', label: 'HeyNoteWidgetProvider.kt' },
+                    { id: 'widget_xml', label: 'widget_heynote_mic.xml' },
                   ].map((sub) => (
                     <button
                       key={sub.id}
                       onClick={() => setSourceCodeTab(sub.id as any)}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-medium transition ${
+                      className={`px-2.5 py-1.5 rounded-lg text-xs font-medium transition ${
                         sourceCodeTab === sub.id
                           ? 'bg-gray-900 text-white font-semibold'
                           : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
@@ -348,7 +369,11 @@ export default function DownloadApkModal({ isOpen, onClose }: DownloadApkModalPr
                         ? FLUTTER_MAIN_DART
                         : sourceCodeTab === 'manifest'
                         ? ANDROID_MANIFEST
-                        : FLUTTER_PUBSPEC;
+                        : sourceCodeTab === 'pubspec'
+                        ? FLUTTER_PUBSPEC
+                        : sourceCodeTab === 'widget_kt'
+                        ? ANDROID_WIDGET_PROVIDER
+                        : ANDROID_WIDGET_XML;
                     handleCopy('source_code', text);
                   }}
                   className="px-3 py-1.5 rounded-lg border border-gray-300 hover:bg-gray-50 text-gray-700 text-xs font-medium transition flex items-center gap-1.5"
@@ -361,7 +386,7 @@ export default function DownloadApkModal({ isOpen, onClose }: DownloadApkModalPr
                   ) : (
                     <>
                       <Copy className="w-3.5 h-3.5" />
-                      <span>Copy</span>
+                      <span>Copy Code</span>
                     </>
                   )}
                 </button>
@@ -372,6 +397,8 @@ export default function DownloadApkModal({ isOpen, onClose }: DownloadApkModalPr
                   {sourceCodeTab === 'main' && FLUTTER_MAIN_DART}
                   {sourceCodeTab === 'manifest' && ANDROID_MANIFEST}
                   {sourceCodeTab === 'pubspec' && FLUTTER_PUBSPEC}
+                  {sourceCodeTab === 'widget_kt' && ANDROID_WIDGET_PROVIDER}
+                  {sourceCodeTab === 'widget_xml' && ANDROID_WIDGET_XML}
                 </pre>
               </div>
             </div>
