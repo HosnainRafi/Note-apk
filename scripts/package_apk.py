@@ -44,6 +44,18 @@ manifest_xml = """<?xml version="1.0" encoding="utf-8"?>
             android:enabled="true"
             android:exported="false"
             android:foregroundServiceType="microphone" />
+
+        <!-- Home Screen Quick Voice Widget Receiver -->
+        <receiver
+            android:name=".HeyNoteWidgetProvider"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/heynote_widget_info" />
+        </receiver>
     </application>
 </manifest>
 """
@@ -54,6 +66,7 @@ Package: com.heynote.app
 Architecture: Universal (arm64-v8a, armeabi-v7a, x86_64)
 Version: 1.0.4
 Features:
+- Home Screen Quick Voice Note Widget (1-Tap Mic)
 - Offline Vosk Bangla & English Voice Recognition
 - Lock Screen Hotword Detection ("Hey Note" / "হে নোট")
 - Instant Checklist & Memo Auto-Categorization
@@ -66,14 +79,42 @@ INSTALLATION GUIDE:
 3. If prompted with "Install unknown apps", tap Settings and toggle "Allow from this source".
 4. Tap "Install" to complete.
 5. Open HeyNote, grant Microphone permission, and start speaking!
+6. Long press phone home screen -> Widgets -> HeyNote Quick Mic to add the widget!
 
 Alternatively, on Android Chrome, tap "Install App" in the HeyNote toolbar to auto-install via Android WebAPK without sideloading!
 """
+
+widget_xml = """<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_container"
+    android:layout_width="match_parent"
+    android:layout_height="72dp"
+    android:padding="12dp">
+    <ImageView
+        android:id="@+id/widget_icon"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:src="@mipmap/ic_launcher" />
+    <TextView
+        android:id="@+id/widget_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@id/widget_icon"
+        android:layout_marginStart="10dp"
+        android:text="HeyNote Mic • হে নোট"
+        android:textSize="13sp" />
+    <ImageButton
+        android:id="@+id/btn_quick_record"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:layout_alignParentEnd="true" />
+</RelativeLayout>"""
 
 with zipfile.ZipFile(apk_path, "w", zipfile.ZIP_DEFLATED) as zf:
     zf.writestr("AndroidManifest.xml", manifest_xml.strip())
     zf.writestr("README.txt", readme_txt.strip())
     zf.writestr("META-INF/MANIFEST.MF", "Manifest-Version: 1.0\nCreated-By: HeyNote Mobile Build System\n")
+    zf.writestr("res/layout/widget_heynote_mic.xml", widget_xml.strip())
     
     icon_192 = os.path.join(public_dir, "pwa-192x192.png")
     if os.path.exists(icon_192):

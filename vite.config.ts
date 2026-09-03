@@ -43,6 +43,22 @@ export default defineConfig(() => {
               purpose: 'maskable',
             },
           ],
+          shortcuts: [
+            {
+              name: 'Record Voice Note (ভয়েস রেকর্ড)',
+              short_name: 'Record Mic',
+              description: 'Immediately trigger voice recording in Bangla or English',
+              url: '/?action=record',
+              icons: [{ src: '/pwa-192x192.png', sizes: '192x192' }],
+            },
+            {
+              name: 'New Checklist (নতুন তালিকা)',
+              short_name: 'Checklist',
+              description: 'Create an instant checklist',
+              url: '/?action=checklist',
+              icons: [{ src: '/pwa-192x192.png', sizes: '192x192' }],
+            },
+          ],
         },
         devOptions: {
           enabled: false,

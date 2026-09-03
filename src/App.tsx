@@ -15,6 +15,8 @@ import {
   ExternalLink,
   Plus,
   RefreshCw,
+  LayoutGrid,
+  X,
 } from 'lucide-react';
 import { ImageResolution, NoteCategory, NoteItem } from './types';
 import {
@@ -30,6 +32,8 @@ import LockScreenOverlay from './components/LockScreenOverlay';
 import ImageGeneratorModal from './components/ImageGeneratorModal';
 import GeminiChatDrawer from './components/GeminiChatDrawer';
 import DownloadApkModal from './components/DownloadApkModal';
+import HomeScreenWidget from './components/HomeScreenWidget';
+import HomeScreenWidgetModal from './components/HomeScreenWidgetModal';
 import { usePWAInstall } from './hooks/usePWAInstall';
 
 export default function App() {
@@ -38,6 +42,9 @@ export default function App() {
   const [isLockScreenActive, setIsLockScreenActive] = useState<boolean>(false);
   const [isChatOpen, setIsChatOpen] = useState<boolean>(false);
   const [isApkModalOpen, setIsApkModalOpen] = useState<boolean>(false);
+  const [isWidgetModalOpen, setIsWidgetModalOpen] = useState<boolean>(false);
+  const [isWidgetPinned, setIsWidgetPinned] = useState<boolean>(true);
+  const [autoRecordFromShortcut, setAutoRecordFromShortcut] = useState<boolean>(false);
   const [imageGenNote, setImageGenNote] = useState<NoteItem | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [categoryFilter, setCategoryFilter] = useState<'all' | NoteCategory>('all');
@@ -49,6 +56,13 @@ export default function App() {
   useEffect(() => {
     const loaded = loadNotes();
     setNotes(loaded);
+
+    // Check if launched via Home Screen shortcut or widget link
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('action') === 'record') {
+      setAutoRecordFromShortcut(true);
+      showToast('Home Screen Shortcut: Voice recording initiated');
+    }
 
     // Online / Offline network listeners
     const handleOnline = () => {
@@ -237,6 +251,17 @@ export default function App() {
               <span className="hidden sm:inline">Lock Screen</span>
             </button>
 
+            {/* Home Screen Widget Simulator */}
+            <button
+              id="header-home-widget-button"
+              onClick={() => setIsWidgetModalOpen(true)}
+              className="px-2.5 py-1.5 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-xs font-medium text-gray-700 transition flex items-center gap-1.5 shadow-xs"
+              title="Configure & Test Home Screen Quick Voice Widget"
+            >
+              <LayoutGrid className="w-3.5 h-3.5 text-gray-600" />
+              <span className="hidden sm:inline">Home Widget</span>
+            </button>
+
             {/* AI Assistant Chat */}
             <button
               onClick={() => setIsChatOpen(true)}
@@ -263,6 +288,51 @@ export default function App() {
 
       {/* Main Mobile App Container */}
       <main className="flex-1 max-w-5xl mx-auto w-full px-4 sm:px-6 py-5 space-y-6">
+        {/* Pinned Home Screen Quick Voice Widget */}
+        {isWidgetPinned && (
+          <section id="pinned-home-screen-widget" className="space-y-2">
+            <div className="flex items-center justify-between px-1">
+              <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5 text-xs font-bold text-gray-800">
+                  <LayoutGrid className="w-3.5 h-3.5 text-gray-600" />
+                  <span>Home Screen Quick Voice Widget</span>
+                </div>
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-800">
+                  1-Tap Mic Ready
+                </span>
+              </div>
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => setIsWidgetModalOpen(true)}
+                  className="text-xs font-semibold text-gray-600 hover:text-gray-900 transition flex items-center gap-1"
+                >
+                  <span>Phone Simulator</span>
+                  <Smartphone className="w-3 h-3 text-gray-500" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsWidgetPinned(false)}
+                  className="text-gray-400 hover:text-gray-600 p-0.5 rounded transition"
+                  title="Dismiss widget from workspace (you can re-enable anytime from Home Widget button)"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
+
+            <HomeScreenWidget
+              variant="pill"
+              onSaveNote={handleSaveNote}
+              isOnline={isOnline}
+              recentNotes={notes}
+              isPinnedToHeader={isWidgetPinned}
+              onTogglePin={() => setIsWidgetPinned(!isWidgetPinned)}
+              autoStartRecording={autoRecordFromShortcut}
+            />
+          </section>
+        )}
+
         {/* Mobile APK Status & Trigger Banner */}
         <div className="bg-white rounded-2xl p-4 sm:p-5 border border-gray-200/80 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
@@ -470,6 +540,15 @@ export default function App() {
         </button>
 
         <button
+          id="mobile-widget-button"
+          onClick={() => setIsWidgetModalOpen(true)}
+          className="flex flex-col items-center gap-1 text-gray-600 hover:text-gray-900 py-1"
+        >
+          <LayoutGrid className="w-4 h-4 text-gray-700" />
+          <span className="text-[10px] font-medium">Widget</span>
+        </button>
+
+        <button
           onClick={() => setIsChatOpen(true)}
           className="flex flex-col items-center gap-1 text-gray-600 hover:text-gray-900 py-1"
         >
@@ -508,6 +587,17 @@ export default function App() {
       <DownloadApkModal
         isOpen={isApkModalOpen}
         onClose={() => setIsApkModalOpen(false)}
+      />
+
+      {/* Home Screen Widget Simulator Modal */}
+      <HomeScreenWidgetModal
+        isOpen={isWidgetModalOpen}
+        onClose={() => setIsWidgetModalOpen(false)}
+        onSaveNote={handleSaveNote}
+        isOnline={isOnline}
+        recentNotes={notes}
+        isPinnedToHeader={isWidgetPinned}
+        onTogglePinHeader={() => setIsWidgetPinned(!isWidgetPinned)}
       />
     </div>
   );
