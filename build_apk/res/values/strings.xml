@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">HeyNote</string>
+    <string name="widget_name">HeyNote Quick Mic</string>
+    <string name="widget_title">HeyNote Mic • হে নোট</string>
+    <string name="widget_subtitle">Tap mic to record voice note</string>
+</resources>

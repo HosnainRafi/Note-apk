@@ -104,7 +104,33 @@
 
 ---
 
-## 📱 Flutter Android APK Build Guide (Ready to Build!)
+## 📦 Pre-Built Android APK in GitHub
+
+The production-ready release APK is tracked directly in this GitHub repository:
+
+- **Primary APK**: `heynote.apk` (Root directory)
+- **Versioned APK**: `heynote-v1.0.4-release.apk`
+- **Web Download File**: `public/heynote.apk`
+
+### 📲 How to Install Directly from GitHub:
+
+#### Method 1: Download from GitHub on Your Phone (Easiest)
+1. Open your repository on GitHub using your phone's browser (e.g. Chrome).
+2. Tap on **`heynote.apk`** in the repository root.
+3. Tap **View raw** or **Download**.
+4. Once downloaded, tap the notification to install! (Allow "Install unknown apps" if prompted).
+
+#### Method 2: Direct Raw Download Link
+You can download the APK directly with this URL pattern on any phone browser:
+```text
+https://github.com/<YOUR-USERNAME>/<YOUR-REPO>/raw/main/heynote.apk
+```
+
+#### Method 3: GitHub Releases & Actions
+- Every push or tag trigger can automatically build and attach `heynote.apk` under **Releases** via `.github/workflows/build-apk.yml`.
+- Go to the **Actions** tab in GitHub to download the build artifact anytime.
+
+---
 
 The repository includes the **complete, self-contained Flutter project** ready to build immediately with Flutter 3.x / Dart 3.x!
 

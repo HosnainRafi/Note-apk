@@ -1,8 +1,17 @@
 node_modules/
 build/
+build_apk/bin/
+build_apk/gen/
+!build/app/outputs/flutter-apk/*.apk
 dist/
 coverage/
 .DS_Store
 *.log
 .env*
 !.env.example
+
+# Always include APK files for GitHub release and direct installation
+!*.apk
+!**/*.apk
+
+

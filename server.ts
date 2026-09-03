@@ -1,5 +1,6 @@
 import express from "express";
 import path from "path";
+import fs from "fs";
 import dotenv from "dotenv";
 import { GoogleGenAI } from "@google/genai";
 import { createServer as createViteServer } from "vite";
@@ -10,6 +11,20 @@ const app = express();
 const PORT = 3000;
 
 app.use(express.json({ limit: "25mb" }));
+
+// Direct APK Download Endpoint
+app.get(["/heynote-v1.0.4-release.apk", "/heynote.apk", "/api/download/apk"], (_req, res) => {
+  const rootApk = path.join(process.cwd(), "heynote.apk");
+  const publicApk = path.join(process.cwd(), "public", "heynote.apk");
+  const targetPath = fs.existsSync(rootApk) ? rootApk : publicApk;
+
+  if (fs.existsSync(targetPath)) {
+    res.setHeader("Content-Type", "application/vnd.android.package-archive");
+    res.setHeader("Content-Disposition", 'attachment; filename="heynote-v1.0.4-release.apk"');
+    return res.sendFile(targetPath);
+  }
+  return res.status(404).json({ error: "APK build not found" });
+});
 
 // Lazy getter for GoogleGenAI
 let aiClient: GoogleGenAI | null = null;

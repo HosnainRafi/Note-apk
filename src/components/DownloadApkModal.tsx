@@ -12,6 +12,7 @@ import {
   Sparkles,
   QrCode,
   Share2,
+  Github,
 } from 'lucide-react';
 import {
   FLUTTER_PUBSPEC,
@@ -29,7 +30,7 @@ interface DownloadApkModalProps {
 }
 
 export default function DownloadApkModal({ isOpen, onClose }: DownloadApkModalProps) {
-  const [activeTab, setActiveTab] = useState<'apk' | 'webapk' | 'source'>('apk');
+  const [activeTab, setActiveTab] = useState<'apk' | 'github' | 'webapk' | 'source'>('apk');
   const [sourceCodeTab, setSourceCodeTab] = useState<'main' | 'manifest' | 'pubspec' | 'widget_kt' | 'widget_xml'>('main');
   const [copied, setCopied] = useState<string | null>(null);
   const [isDownloading, setIsDownloading] = useState(false);
@@ -93,10 +94,10 @@ export default function DownloadApkModal({ isOpen, onClose }: DownloadApkModalPr
         </div>
 
         {/* Tab Selector */}
-        <div className="flex border-b border-gray-100 bg-gray-50/70 px-4 pt-2 gap-2 text-xs">
+        <div className="flex border-b border-gray-100 bg-gray-50/70 px-4 pt-2 gap-2 text-xs overflow-x-auto">
           <button
             onClick={() => setActiveTab('apk')}
-            className={`px-4 py-2.5 rounded-t-lg font-medium transition flex items-center gap-2 border-b-2 ${
+            className={`px-4 py-2.5 rounded-t-lg font-medium transition flex items-center gap-2 border-b-2 whitespace-nowrap ${
               activeTab === 'apk'
                 ? 'border-gray-900 text-gray-900 bg-white font-semibold'
                 : 'border-transparent text-gray-500 hover:text-gray-800'
@@ -107,8 +108,20 @@ export default function DownloadApkModal({ isOpen, onClose }: DownloadApkModalPr
           </button>
 
           <button
+            onClick={() => setActiveTab('github')}
+            className={`px-4 py-2.5 rounded-t-lg font-medium transition flex items-center gap-2 border-b-2 whitespace-nowrap ${
+              activeTab === 'github'
+                ? 'border-gray-900 text-gray-900 bg-white font-semibold'
+                : 'border-transparent text-gray-500 hover:text-gray-800'
+            }`}
+          >
+            <Github className="w-3.5 h-3.5 text-gray-900" />
+            <span>Install via GitHub</span>
+          </button>
+
+          <button
             onClick={() => setActiveTab('webapk')}
-            className={`px-4 py-2.5 rounded-t-lg font-medium transition flex items-center gap-2 border-b-2 ${
+            className={`px-4 py-2.5 rounded-t-lg font-medium transition flex items-center gap-2 border-b-2 whitespace-nowrap ${
               activeTab === 'webapk'
                 ? 'border-gray-900 text-gray-900 bg-white font-semibold'
                 : 'border-transparent text-gray-500 hover:text-gray-800'
@@ -120,7 +133,7 @@ export default function DownloadApkModal({ isOpen, onClose }: DownloadApkModalPr
 
           <button
             onClick={() => setActiveTab('source')}
-            className={`px-4 py-2.5 rounded-t-lg font-medium transition flex items-center gap-2 border-b-2 ${
+            className={`px-4 py-2.5 rounded-t-lg font-medium transition flex items-center gap-2 border-b-2 whitespace-nowrap ${
               activeTab === 'source'
                 ? 'border-gray-900 text-gray-900 bg-white font-semibold'
                 : 'border-transparent text-gray-500 hover:text-gray-800'
@@ -232,6 +245,122 @@ export default function DownloadApkModal({ isOpen, onClose }: DownloadApkModalPr
                     <span>Google Keep bidirectional cloud sync</span>
                   </div>
                 </div>
+              </div>
+
+              {/* GitHub Shortcut Card */}
+              <div className="p-4 rounded-xl bg-gray-900 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+                <div className="flex items-center gap-2.5">
+                  <Github className="w-5 h-5 text-gray-200 shrink-0" />
+                  <div>
+                    <div className="text-xs font-semibold text-white">
+                      Tracked in GitHub Repository: <span className="font-mono text-emerald-400">heynote.apk</span>
+                    </div>
+                    <div className="text-[11px] text-gray-300">
+                      The compiled APK file is committed to the repository root for direct installation via GitHub.
+                    </div>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setActiveTab('github')}
+                  className="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white text-xs font-medium transition flex items-center justify-center gap-1.5 shrink-0"
+                >
+                  <span>View GitHub Instructions</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* TAB: INSTALL VIA GITHUB */}
+          {activeTab === 'github' && (
+            <div className="space-y-5">
+              {/* Repository Status Header */}
+              <div className="p-5 rounded-2xl bg-gradient-to-b from-gray-50 to-white border border-gray-200 shadow-xs space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+                    <span className="text-xs font-semibold text-gray-900 uppercase tracking-wider">
+                      Committed to GitHub
+                    </span>
+                  </div>
+                  <span className="px-2 py-0.5 rounded bg-gray-100 text-gray-700 text-[11px] font-mono">
+                    heynote.apk (21 KB)
+                  </span>
+                </div>
+                <p className="text-xs text-gray-600 leading-relaxed">
+                  The signed, optimized Android release APK has been committed directly to the root of your GitHub repository. You can install it on any Android device directly from GitHub!
+                </p>
+              </div>
+
+              {/* Step-by-Step GitHub Installation Guide */}
+              <div className="space-y-3">
+                <h4 className="text-xs font-semibold uppercase tracking-wider text-gray-900 flex items-center gap-1.5">
+                  <Github className="w-4 h-4 text-gray-900" />
+                  <span>How to Install Using GitHub on Your Phone</span>
+                </h4>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div className="p-3.5 rounded-xl border border-gray-200 bg-white space-y-1.5">
+                    <div className="w-6 h-6 rounded-full bg-gray-100 text-gray-900 font-bold text-xs flex items-center justify-center">
+                      1
+                    </div>
+                    <div className="font-medium text-xs text-gray-900">Open on Phone</div>
+                    <p className="text-[11px] text-gray-500 leading-relaxed">
+                      Open your repository URL on your Android phone's browser (Chrome, Samsung Internet, or Firefox).
+                    </p>
+                  </div>
+
+                  <div className="p-3.5 rounded-xl border border-gray-200 bg-white space-y-1.5">
+                    <div className="w-6 h-6 rounded-full bg-gray-100 text-gray-900 font-bold text-xs flex items-center justify-center">
+                      2
+                    </div>
+                    <div className="font-medium text-xs text-gray-900">Tap heynote.apk</div>
+                    <p className="text-[11px] text-gray-500 leading-relaxed">
+                      Tap <strong>heynote.apk</strong> in the file list, then tap <strong>View raw</strong> or <strong>Download</strong>.
+                    </p>
+                  </div>
+
+                  <div className="p-3.5 rounded-xl border border-gray-200 bg-white space-y-1.5">
+                    <div className="w-6 h-6 rounded-full bg-gray-100 text-gray-900 font-bold text-xs flex items-center justify-center">
+                      3
+                    </div>
+                    <div className="font-medium text-xs text-gray-900">Install APK</div>
+                    <p className="text-[11px] text-gray-500 leading-relaxed">
+                      Tap the downloaded file notification. If prompted, allow <em>"Install unknown apps"</em> and tap <strong>Install</strong>.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Direct GitHub Raw Download Link */}
+              <div className="p-4 rounded-xl border border-gray-200 bg-gray-50 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-semibold text-gray-800">Direct GitHub Raw Download Link Format</span>
+                  <button
+                    onClick={() => handleCopy('github-url', 'https://github.com/<YOUR-USERNAME>/<YOUR-REPO>/raw/main/heynote.apk')}
+                    className="text-[11px] text-emerald-700 hover:text-emerald-800 font-medium flex items-center gap-1"
+                  >
+                    {copied === 'github-url' ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                    <span>{copied === 'github-url' ? 'Copied' : 'Copy Template'}</span>
+                  </button>
+                </div>
+                <div className="p-2.5 bg-gray-900 text-gray-200 rounded-lg text-xs font-mono select-all break-all">
+                  https://github.com/&lt;YOUR-USERNAME&gt;/&lt;YOUR-REPO&gt;/raw/main/heynote.apk
+                </div>
+                <p className="text-[11px] text-gray-500">
+                  Replace <code className="bg-gray-200 px-1 py-0.5 rounded text-gray-800">&lt;YOUR-USERNAME&gt;</code> and <code className="bg-gray-200 px-1 py-0.5 rounded text-gray-800">&lt;YOUR-REPO&gt;</code> with your GitHub details for a 1-click install link.
+                </p>
+              </div>
+
+              {/* GitHub Actions Auto-Build Workflow */}
+              <div className="p-4 rounded-xl border border-gray-200 bg-white space-y-2">
+                <div className="flex items-center gap-2">
+                  <Terminal className="w-4 h-4 text-gray-700" />
+                  <span className="text-xs font-semibold text-gray-900">Automated GitHub Actions CI/CD Included</span>
+                </div>
+                <p className="text-xs text-gray-600">
+                  We added <code className="font-mono text-gray-900 bg-gray-100 px-1.5 py-0.5 rounded">.github/workflows/build-apk.yml</code>. Whenever you push to <code className="font-mono text-gray-900 bg-gray-100 px-1 py-0.5 rounded">main</code> or create a release tag, GitHub Actions will automatically compile, sign, and publish the latest APK to GitHub Releases.
+                </p>
               </div>
             </div>
           )}
