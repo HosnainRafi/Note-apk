@@ -1,0 +1,6 @@
+{
+  "name": "HeyNote: Smart Voice Notes",
+  "description": "Bilingual Bangla & English voice note taker with lock-screen Hey Note trigger, offline recognition, automatic list detection, Gemini TTS, AI image generation, and Google Keep sync.",
+  "requestFramePermissions": ["microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
